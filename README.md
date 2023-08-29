@@ -6,7 +6,7 @@ Simple image editor aka ANDIE is an image editor that every Computer Science gra
 
 Although its not unique or a defining project, it demonstrates that I can do OOP and fiddle with the pain of java GUI.
 
-![Application UI](https://imgur.com/a/tHEuRbC)
+![Application UI](https://i.imgur.com/AZHMhdO.jpg)
 
 For my (group's) implementation, the image editor has the following functions:<br>
 - Image filters (Emboss, Sobel, Greyscale, Gaussian etc)
