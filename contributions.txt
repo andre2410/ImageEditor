@@ -1,0 +1,253 @@
+## Resize and Rotation - Ben Addison
+- Currently, the Resize and rotate functions can be accessed in the menus, with the shortcuts and with the toolbar icons which rotate the image 90 deg either left or right. 
+- I tested these methods at the end using JUnit where I checked to see if the undo stack is greater than it previously was using an AssertFalse. 
+# Inner workings
+The rotation and resize both use an Affine Transform which deals with the scaling and buffer rotation. The transform is applied to the output buffered image through the filter method and is then returned. The two functions are similar in concept but differ in the type of transform that is used.
+![Alt text](https://blog.codemagic.io/uploads/Deven/image4.png)
+
+# Known issues and bugfixes/error handling
+- There is still the underlying issue where rotating an image outside of 90 degree increments will crop parts out of the original image as an adjustment system has not been implemented yet.
+- Some of the bugfixing I did mainly revolved around the user experience of the rotate and resize functionality. For example, restricting users from entering negative angles or sizes out of reasonable bounds. I'd also fixed and improved issues to do with the save function, like saving an empty image caused the program to crash and prompted the user that a save was successful. A few of the smaller things I improved on were the categories where functions would be found to make more sense to the user.
+
+# Emboss and Sobel - Ben Addison & Nicky Patterson
+## Ben:
+- I implemented the Sobel filter and the UI for the emboss and sobel effect. The emboss and sobel filter is found in the filters menu slot and can be quickly used using CTRL-7.
+- The edge detect/sobel algorithm modifies the image to enhance the edges and diminish the non-edges which creates fairly noisy emphasis of the changes in color and brightness. This algorithm also uses the convolution operations provided in java so modifications to how the effect behaves can be changed there.
+- The edge detect had been tested on empty images and 1 pixel wide images using some JUnit testing with AssertFalse statements.
+### Inner workings for Sobel Effect:
+- ![Alt text](https://miro.medium.com/max/910/1*NTuG456VXhSh7X-mhekP4A.gif)
+- The above image is a representation of the two kernals used to perform the sobel effects. The figure on the left is the horizontal kernal while the figure on the right is the verticaL kernel. 
+- Both of these kernels perform the same functionality but at different orientations.
+### Dynamic GUI - Ben:
+- The interface for the emboss and sobel effect has a GUI that adapts to the users currently selected options. In it's current state, it is fairly basic but forms the foundation of what I imagine users will expect when using this filter.
+- The user can select between the type of emboss they want to use and then select the direction of the effect.
+
+
+## Dependency Management
+
+The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+
+## Features
+Invert Colours (Nicky Patterson)
+- Accessed through colours menu or hot key Ctrl + t
+- flips the images RGB values, inverting its colours, meaning it is reversable by re-inverting 
+- Tested using the maximum possible RGB - values of the pixels RGB
+- No known issues
+Simplify / Comic-ify (Nicky Patterson)
+- Accessed through colours menu
+- Applies a cel-shading like effect, similar to that seen in comic books or tell tale games media
+- created in attempt to make a filter that simplifies an images colours, making colours look more solid, 
+however this isntead presented a strong black outline effect, after changing values this was made to mimic comic book effects
+- No known issues
+NotGrey (Nicky Patterson)
+- Accessed through colours menu
+- Attempts to recolour a grey scale image through random colour generation
+- various methods of achieving this were tested however random number generation for rgb values of each pixel in a predetermined array of options
+- tested using a variety of greyscale different images, to verrying degrees of success
+- No known images
+
+Brightness and contrast (Tony Cenaiko)
+- Accessed through menu (Brightness and Contrast) and hot-key "ctrl+L"
+- Created using 'brightness and contrast' formula supplied in COSC202 lab book. JOptionPane with dual sliders is used to retrieve brightness and contrast percentage change from user.
+- Tested formula using calcutor with RGB values between 0 and 255 and B&C percentage adjustments between -100 and 100 to ensure sensible output. Tested feature by applying B&C operation to various pictures with different colour qualities to ensure feature behaved predictably.
+- No known issues
+
+Toolbar (Tony Cenaiko)
+- Automatic access on left side of frame. Features accessed through Toolbar include save, zoom in/out, undo/redo, 90 degree rotations, vertical and horizontal flips
+- Created using JToolbar and JButtons. Icons for buttons were sourced from www.flaticon.com.
+- Tested toolbar features on various images and compared output to running the same features using menu to ensure output was identical. Tested all features when no image had been loaded to ensure exception handling behaved appropriately.
+- Chose features to add to toolbar based on which features were single click operations (no submenu pop-ups requiring additonal input) and were likely to require repeated operations (a feature like greyscale would not be executed multiple times). Features such as undo/redo and zoom in/out require a single click to execute operation and are often executed repeatedly by the user, making them appropriate toolbar features.
+- No known issues
+
+Posterize (Tony Cenaiko)
+- Accessed through Colours menu
+- Created by restricting RGB values according to level, and at each increasing level the number of values available is doubled; at "level 0", only 0 and 255 are available; at "level 1", 0, 127, 255 are available; at "level 2", 0, 63, 127, 190, 255 are available, etc. RGB values are reset to whichever available RGB values are closest to their original values. JOptionPane with slider allows user to choose posterization level.
+- Tested feature by writing out by hand the algorithm that sets available RGB values, then applied feature to various images of different sizes and colours to ensure it behaved appriopriately and predictably
+- No known issues
+
+Macros
+- Accessed through Macro menu
+- Created by creating a boolean value named "recording" in EditableImage and a macroOps stack; if recording is set to true, all applied operations will be placed in macroOps stack (works with undo/redo). "Start Record" sets recording to true and places a red border around image panel. "End Record" ends recording and prompts user to save macroOps to a .macro file. "Save" allows user to save macroOps to .macro file without ending recording. "Apply" allows user to choose .macro file to apply to current image. "Clear" allows user to clear macroOps stack. "Inspect" allows user to check what image operations are contained in .macro and .ops files.
+- Tested feature by applying each menu action on various images with various image operations to ensure sensible output.
+- Known issues: Image operations that rely on specific x and y coordinates, such as cropping and drawing features, may not behave as intended when saved to a .macro file that's applied to other images with different x and y values. For example, if a crop action is performed on a large image and saved to a .macro file, and then reapplied to a smaller image, if the x and y coordinates are out of bounds for the smaller image then the image will not be cropped.
+
+Gaussian Filter (Rosie Bicknell)
+- Accessed through menu (Filter) and hot-key "ctrl+G"
+- Created by applying the Gaussian equation provided in the COSC202 lab to a kernal of size dependant on the user chosen radious.
+- This kernal was then standardised so as to accomodate for a radius of size 1
+- Formula was tested via printing out the kernal values and comparing them to examples provided in the lab book, along with computing these on my own calculator.
+- No known issues
+
+Median Filter (Rosie Bicknell)
+- Accessed through menu (Filter) and hot-key "ctrl+D"
+- Created by assinging each pixel the average from all colour channels of neighbouring pixels of a radius determined by the user
+- Formula was tested by printing out the values of each colour channels of neighbouring pixels, the average of each, and the new argb value of the pixel, and comparing them to the values I computer myself (based off the observed values).
+- No known issues
+
+Sharpen Filter (Rosie Bicknell)
+- Accessed through menu (Filter) and hot key "ctrl+P"
+- Created by applying kernal provided in the COSC202 lab book.
+- Tested out on several images by applying applying blur then sharpen to observe if the effects were negated. The values of the kernal were also printed out to ensure that they matched those provided.
+- No known issues
+
+Hot-Keys (Rosie Bicknell)
+- Created "hot-keys" for each of the commands in ANDIE  
+
+File Actions: 
+
+| Action  | Hot-Key  |
+|---------|----------|
+| Open    | Ctrl + O |
+| Save    | Ctrl + S |
+| Save As | Ctrl + A |
+| Exit    |Ctrl + End|
+| Export  | Ctrl + X |
+
+Edit Actions: 
+
+| Action  | Hot-Key  |
+|---------|----------|
+| Undo    | Ctrl + Z |
+| Redo    | Ctrl + Y |
+
+Crop Actions: 
+
+| Action  | Hot-Key  |
+|---------|----------|
+| Crop    | Ctrl + C |
+
+View Actions:
+
+| Action  | Hot-Key  |
+|---------|----------|
+| Zoom In    | Ctrl + '+' |
+| Zoom Out    | Ctrl + '-' |
+| Zoom Full | Ctrl + 1 |
+Note
+- This zoom in key is set to the 'EQUALS' key whixch is shared with the PLUS key on keyboards. This was done for consistancy with cross platform user experience
+
+Filter Actions: 
+
+| Action  | Hot-Key  |
+|---------|----------|
+| Mean Filter    | Ctrl + M |
+| Median Filter    | Ctrl + D |
+| Gaussian Filter | Ctrl + G |
+| Sharpen    |Ctrl + P|
+
+Colour Actions: 
+
+| Action  | Hot-Key  |
+|---------|----------|
+| Greyscale| Ctrl + B |
+| Brightness and Contrast| Ctrl + L |
+
+Adjustment Actions: 
+
+| Action  | Hot-Key  |
+|---------|----------|
+| Edge Detect    | Ctrl + E |
+| Resize    | Ctrl + I |
+| Rotation | Ctrl + R |
+| Flip Vertical    |Ctrl + V|
+| Flip Horizontal  | Ctrl + H |
+
+Testing
+- All hot-keys were tested to ensure that they performed the intended action
+- Both the intended keys and unintended keys were pressed to check that not only did they do what they were supposed to - but border and unexpected cases didn't do anything they shouldn't 
+- No known issues.
+
+Stop User From Exiting with Unsaved Changes (Rosie Bicknell)
+- Gives the user a message box if they try to exit ANDIE when they have unsaved changes made to their image. This tells the user they have unsaved changes and asks whether they still want to exit the program. This works for both clicking the exit button, clicking on the exit option in the menu, or using the hot-key Ctrl + End.
+- This was tested by trying the following cases
+
+| Action                               | Response                     |
+|--------------------------------------|------------------------------|
+| Exit via top right (unsaved changes) | Confirmation dialogue box    |
+| Exit via top right (no changes)      | No confirmation dialogue box |
+| Exit via top right (saved changes)   | No confirmation dialogue box |
+| Exit via top right (no image)   | No confirmation dialogue box |
+| Exit via menu (unsaved changes) | Confirmation dialogue box    |
+| Exit via menu (no changes)      | No confirmation dialogue box |
+| Exit via menu (saved changes)   | No confirmation dialogue box |
+| Exit via menu (no image)   | No confirmation dialogue box |
+| Exit via hot-key (unsaved changes) | Confirmation dialogue box    |
+| Exit via hot-key (no changes)      | No confirmation dialogue box |
+| Exit via hot-key (saved changes)   | No confirmation dialogue box |
+| Exit via hot-key (no image)   | No confirmation dialogue box |
+
+- No known issues
+
+Fixed Filter Borders Using ConvolveOp (Rosie Bicknell)  
+-
+- Enlarged the image by the size of the radius and placed the original image in the centre so that it was padded by colours which matched the edges. The filter was the applied and the image was cropped back to its original size.  
+- To avoid error with the BuffferedImage subimage method, I created a nwe BufferedImage and copied accross this information to a new BufferedImage, setting the minX and minY back to 0 so that filters can be applied on top.
+- Was tested on a variety of images with different radiuses (when applicable)
+- Filters were tested on no image 
+- Filters were tested on images which have been drawn on
+- Filters were tested on top of other non ConvolveOp filters
+- Fitlers were tested on top of other Colvolveop filteres
+- Non ConvolveOp filters were tested on top of ConvolveOp filters
+- No known issues
+
+Drawing (Rosie Bicknell)  
+- 
+- Created a new toolbar for drawing (top of the application under the menu bar)
+- Created an actions class for drawing which within it calls the apply method of each shape
+- Created classes for each shape, containing an apply method which draws the shape onto the image and
+- This layout allows drawing actions to be added to the stack and undone/redone as well as saved and exported
+- Users can select a shape from the drop down menu as well as choose a colour from the colour picker and draw on top of the image
+- Shapes accomodate for how zoomed in the user is 
+- Shapes can be applied with a macro. The decision made on how this would be applied is that shapes would be drawn at the same x and y position as the image they were applied on. This will not look uniform for images of different sizes but was done over applying based on scale to preserce the dimensions of the shapes and to avoid warping them.  
+- Original shape colours are preserved when using the macro.
+- Tested on all filters and actions - drawing before filter and filter after drawing
+- Tested on crop 
+- No known issues
+
+Image Export (Andrew Goh)
+- Accessed through File actions menu, keyboard shortcut (ctrl + x)
+- Tested if image of specific image type was produced. First test by stating image type e.g image.png and the second by stating the name only. Both should produced only image files.
+  If user does not state image type or states other image types besides png and jpg, the image would be exported as jpg by default.
+- As of now, if the user types image.png.png, the image would be still a png but the name would be "image.png".
+
+Flip Vertical/Flip Horizontal (Andrew Goh)
+- Accessed through Adjustments menu, keyboard shortcuts: vertical (ctrl + v), horizontal (ctrl + h).
+- Opened an image and used flip Vertical and opened the original image separately and placed side by side to compare details, I used a relatively easy image to compare ("doge loaf"). Repeated process with flip Horizontal.
+- As method to flip uses a double for loop, may take longer to process for extremely large images.
+
+Crop (Andrew Goh)
+- Accessed through Crop menu, keyboard shortcut (ctrl + c)
+- Tested by opening images of different sizes and applying the crop feature. It works with some initial bugs initially, however
+  some big problems arised when trying to use cropped image with other features. More details in Errors component below.
+- As of now, crop seems to work fine with other features. In general, the crop function works without producing errors.
+
+Mouse Selection Rectangular Region (Andrew Goh)
+- This feature was meant to be shared with crop and drawing features. The initial idea was that it can be served as an external class
+  where it can be called and used. However it proved to be a major setback as some data fields required for the respective features cannot be obtained. The structure of the class (MouseComponent) was then adjusted into a inner class which worked alot better (for crop at least). As the implementation took longer than expected, Rosie who did the drawing feature made her own mouse selection component which makes me feel bad.
+
+## Errors
+
+File save error: Mac OS not allowing user to enter to filenames when using saveAs or export methods. Changed showOpenDialog to showSaveDialog - Tony Cenaiko
+
+Opening non-image files error: Program crashes when user attempts to open non-image files. Adjusted FileChooser in the open method to only allow jpg/jpeg/png files to be selectable - Tony Cenaiko
+
+Ops carrying over to new images: When an image is edited and a new image is opened, the ops from the previous image are carried over. Fixed by calling ops.clear() when the open method is called - Tony Cenaiko
+
+Undo and redo on empty image: Stack error when method is called on empty image. Fixed by checking ops or redoOps first before running method. - Andrew Goh
+
+All actions on empty image: Quality of life issue. Fixed by checking if original bufferedImage exists, throws popup message if non-existent - Andrew Goh
+
+Saveas and export producing non image file: If user does not state image type e.g image.jpg or states nonsense type e.g image.blah, andie exports image as a normal file or nonsense file. Fixed by specifying image type in output file, default as jpg. - Andrew Goh 
+
+Initially, crop would not crop the image if selected rectangle exceeds beyond the image frame. Fixed by confining the rectangle values
+within the imagePanel size. Although the rectangle border exceeds the frame (at the bottom and the right side), it has been tested and the sizing values remain confined within the range of the imagePanel size - Andrew Goh
+
+After fixing the rectangle selection exceeding the image size for crop, a weird minor bug emerged. The rectangle selection could extend
+itself to the right although the max border has been reached to the left. In other words, the rectangle could keep drawing to the right
+although the left border of the rectangle is reached. The bug did not stop the crop function from working but it was a nuisance to use when trying to crop images near to the left border. Luckily, Tony came up with a fix before I did and it has been resolved. - Andrew Goh
+
+Cropped image not allowing filters to be applied. Fixed by creating a new BufferedImage and copying the information from the subImage accross so that the minX and minY values are 0. - Rosie Bicknell.  
+
+Cropped image having incorrect dimensions when zommed in. Fixed by dividing the coordinates and dimensions by the current scale. - Rosie Bicknell.  
+
+
